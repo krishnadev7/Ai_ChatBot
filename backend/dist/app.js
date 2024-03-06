@@ -1,6 +1,6 @@
 import express from 'express';
 import { config } from 'dotenv';
-import appRouter from './routes';
+import appRouter from './routes/index.js';
 config();
 const app = express();
 //middlewares
