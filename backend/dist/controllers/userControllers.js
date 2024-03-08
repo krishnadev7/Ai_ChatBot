@@ -1,6 +1,7 @@
 import User from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/tokenManager.js";
+import { COOKIE_NAME } from "../utils/constants.js";
 export const getAllUsers = async (req, res, next) => {
     try {
         const users = await User.find();
@@ -18,6 +19,23 @@ export const userSignUp = async (req, res, next) => {
             const hashedPass = await bcrypt.hash(password, 10);
             const user = new User({ name, email, password: hashedPass });
             await user.save();
+            // creating token and store cookei
+            res.clearCookie(COOKIE_NAME, {
+                path: "/",
+                domain: "localhost",
+                httpOnly: true,
+                signed: true,
+            });
+            const token = createToken(user._id.toString(), user.email, "7d");
+            const expires = new Date();
+            expires.setDate(expires.getDate() + 7);
+            res.cookie(COOKIE_NAME, token, {
+                path: "/",
+                domain: "localhost",
+                expires,
+                httpOnly: true,
+                signed: true,
+            });
             return res.status(200).json({ message: "ok", id: user._id.toString() });
         }
         else {
@@ -35,7 +53,22 @@ export const userLogin = async (req, res, next) => {
         if (user) {
             const isMatch = await bcrypt.compare(password, user.password);
             if (isMatch) {
+                res.clearCookie(COOKIE_NAME, {
+                    path: "/",
+                    domain: "localhost",
+                    httpOnly: true,
+                    signed: true,
+                });
                 const token = createToken(user._id.toString(), user.email, "7d");
+                const expires = new Date();
+                expires.setDate(expires.getDate() + 7);
+                res.cookie(COOKIE_NAME, token, {
+                    path: "/",
+                    domain: "localhost",
+                    expires,
+                    httpOnly: true,
+                    signed: true,
+                });
                 return res.status(200).json({ message: "ok", tokenId: token });
             }
             else {
@@ -50,4 +83,4 @@ export const userLogin = async (req, res, next) => {
         return res.status(500).json({ message: error });
     }
 };
-//# sourceMappingURL=getAllUsers.js.map
+//# sourceMappingURL=userControllers.js.map
