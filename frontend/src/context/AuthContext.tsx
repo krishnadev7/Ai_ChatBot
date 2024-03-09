@@ -17,7 +17,7 @@ const AuthContext = createContext<UserAuth | null>(null);
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
     const [user,setUser] = useState<User | null>(null);
-    const [isLoggedIn,setIsLoggedIn] = useState(false);
+    const [isLoggedIn,setIsLoggedIn] = useState(true);
 
     useEffect(() => {
 
@@ -37,4 +37,4 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-export const UserAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);
